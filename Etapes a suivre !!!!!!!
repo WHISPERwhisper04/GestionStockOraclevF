@@ -1,0 +1,123 @@
+              PARTIE ORACLE
+-----------------------------------------------------------------
+1--On va creer un nouveu Workspace 'stock'
+avec:
+DATABASE USERNAME =stock
+APPLCATION EXPRESS USERNAME =root
+PASSWORD =root
+CONFIRM PASSWORD =root
+------>CREATE NEW WORKSPACE
+2-On va maintenant se connecter
+WORKSPACE =stock
+USERNAME = root
+PASSWORD = root
+3-Maintenant on va creer les tables
+-------fournisseur------
+CREATE TABLE Fournisseur (
+    ID_Fournisseur number,
+    Nom_Fournisseur VARCHAR2(100) NOT NULL,
+    Tel_Fournisseur VARCHAR2(20),
+    Email_Fournisseur VARCHAR2(100),
+    CONSTRAINT pk_fournisseur PRIMARY KEY(ID_Fournisseur)
+);
+--------Rayon------------
+CREATE TABLE Rayon (
+    ID_Rayon number,
+    Nom_Rayon VARCHAR2(100) NOT NULL UNIQUE,
+    CONSTRAINT pk_Rayon PRIMARY KEY(ID_Rayon)
+);
+--------Depot------------
+CREATE TABLE Depot (
+    ID_Depot number,
+    Nom_Depot VARCHAR2(100) NOT NULL,
+    Adresse VARCHAR2(255),
+    CONSTRAINT pk_Depot PRIMARY KEY(ID_Depot)
+);
+--------Client------------
+CREATE TABLE Client (
+    ID_Client number,
+    Nom_Client VARCHAR2(100) NOT NULL,
+    Prenom_Client VARCHAR2(100),
+    Adresse_Client VARCHAR2(255),
+    Email_Client VARCHAR2(100),
+    CONSTRAINT pk_Client PRIMARY KEY(ID_Client)
+);
+
+--------produit-----------
+CREATE TABLE Produit (
+    ID_Produit number,
+    Nom_Produit VARCHAR2(100) NOT NULL UNIQUE,
+    Prix_Unitaire NUMBER NOT NULL,
+    Seuil_min NUMBER NOT NULL,
+    Description VARCHAR2(255),
+    ID_Rayon number,
+    CONSTRAINT pk_produit PRIMARY KEY(ID_Produit),
+    CONSTRAINT fk_Rayon FOREIGN KEY (ID_Rayon) REFERENCES Rayon(ID_Rayon) ON DELETE CASCADE
+);
+-------Bon d'achat----------
+CREATE TABLE Bon_achat (
+    ID_Fournisseur number,
+    ID_Produit number,
+    Qte_Commandee NUMBER NOT NULL,
+    Date_Commande DATE NOT NULL,
+    CONSTRAINT pk_bonA PRIMARY KEY(ID_Fournisseur,ID_Produit),
+    CONSTRAINT fk_bon_four FOREIGN KEY (ID_Fournisseur) REFERENCES Fournisseur(ID_Fournisseur) ON DELETE CASCADE,
+    CONSTRAINT fk_bon_prod FOREIGN KEY (ID_Produit) REFERENCES Produit(ID_Produit) ON DELETE CASCADE
+);
+--------Commande----------------
+CREATE TABLE Commande (
+    ID_Commande number,
+    Date_Commande DATE NOT NULL,
+    Statut VARCHAR2(20),
+    ID_Client number,
+    CONSTRAINT pk_commande PRIMARY KEY(ID_Commande),
+    FOREIGN KEY (ID_Client) REFERENCES Client(ID_Client) ON DELETE CASCADE
+);
+--------Ligne_Commande----------------
+CREATE TABLE Ligne_Commande (
+    ID_Produit number,
+    ID_Commande number,
+    Qte_Commandee NUMBER NOT NULL,
+    Montant_a_Payer NUMBER NOT NULL,
+    CONSTRAINT pk_ligneCom PRIMARY KEY(ID_Produit,ID_Commande),
+    CONSTRAINT fk_ligne_prod FOREIGN KEY (ID_Produit) REFERENCES Produit(ID_Produit) ON DELETE CASCADE,
+    CONSTRAINT fk_ligne_comm FOREIGN KEY (ID_Commande) REFERENCES Commande(ID_Commande) ON DELETE CASCADE
+);
+--------Inventaire----------------
+CREATE TABLE Inventaire (
+    ID_Rayon number,
+    ID_Depot number,
+    Qte_stockee NUMBER NOT NULL,
+    Date_maj Date NOT NULL,
+    CONSTRAINT pk_invent PRIMARY KEY(ID_Rayon,ID_Depot),
+    CONSTRAINT fk_inv_rayon FOREIGN KEY (ID_Rayon) REFERENCES Rayon(ID_Rayon) ON DELETE CASCADE,
+    CONSTRAINT fk_inv_depot FOREIGN KEY (ID_Depot) REFERENCES Depot(ID_Depot) ON DELETE CASCADE
+);
+--------------------------------------------
+4--------On va utiliser des sequences pour generer des id automatiquement
+------1-Pour Fournisseur-------------
+CREATE SEQUENCE seq_fournisseur
+    INCREMENT BY 1
+    START WITH 1;
+------2-Pour Produit-------------
+CREATE SEQUENCE seq_produit
+    INCREMENT BY 1
+    START WITH 1;
+------3-Pour Client-------------
+CREATE SEQUENCE seq_client
+    INCREMENT BY 1
+    START WITH 1;
+------4-Pour Commande-------------
+CREATE SEQUENCE seq_commande
+    INCREMENT BY 1
+    START WITH 1;
+------5-Pour Depot-------------
+CREATE SEQUENCE seq_depot
+    INCREMENT BY 1
+    START WITH 1;
+------6-Pour Rayon-------------
+CREATE SEQUENCE seq_rayon
+    INCREMENT BY 1
+    START WITH 1;
+    
+
